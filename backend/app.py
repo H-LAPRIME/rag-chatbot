@@ -1,9 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify ,send_from_directory
 from flask_cors import CORS
 from agent.agent_config import build_agent
 from embedding.build_index import build_index
 import os
 from werkzeug.utils import secure_filename
+from files_manager.files_utils import *
+from insert_db import process_file_and_insert, process_multiple_files, process_folder
 
 app = Flask(__name__)
 CORS(app)
@@ -28,45 +30,6 @@ def health():
     """Health check endpoint"""
     return jsonify({"status": "ok"}), 200
 
-@app.route("/api/upload", methods=["POST"])
-def upload_file():
-    """Upload files endpoint"""
-    try:
-        if 'files' not in request.files:
-            return jsonify({"error": "No files provided"}), 400
-        
-        files = request.files.getlist('files')
-        uploaded_files = []
-        
-        for file in files:
-            if file.filename == '':
-                continue
-            
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                file.save(filepath)
-                uploaded_files.append(filename)
-                print(f"Uploaded: {filename}")
-            else:
-                return jsonify({
-                    "error": f"File type not allowed: {file.filename}. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
-                }), 400
-        
-        if not uploaded_files:
-            return jsonify({"error": "No valid files uploaded"}), 400
-        
-        return jsonify({
-            "message": f"Successfully uploaded {len(uploaded_files)} file(s)",
-            "files": uploaded_files,
-            "folder_path": UPLOAD_FOLDER
-        }), 200
-    
-    except Exception as e:
-        print(f"Error in upload_file: {str(e)}")
-        return jsonify({
-            "error": f"Upload failed: {str(e)}"
-        }), 500
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
@@ -124,6 +87,278 @@ def build_index_endpoint():
             return jsonify({
                 "error": error_str
             }), 500
+
+
+# FEEDING FILES MANAGEMENT END POINTS #####################
+# ---------- POST: Upload Files ----------
+@app.route("/api/files", methods=["POST"])
+def upload_files():
+    if "files" not in request.files:
+        return jsonify({"error": "No files provided"}), 400
+
+    files = request.files.getlist("files")
+    response = []
+
+    for file in files:
+        filename = secure_filename(file.filename)
+
+        if not allowed_file(filename):
+            response.append({
+                "name": filename,
+                "status": "rejected",
+                "reason": "unsupported file type"
+            })
+            continue
+
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(file_path)
+
+        response.append({
+            "name": filename,
+            "status": "uploaded"
+        })
+
+    return jsonify(response), 201
+
+# ---------- GET: List Files ----------
+@app.route("/api/files", methods=["GET"])
+def list_files():
+    files = []
+
+    for filename in os.listdir(UPLOAD_FOLDER):
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+        if os.path.isfile(file_path) and allowed_file(filename):
+            files.append(file_metadata(file_path))
+
+    return jsonify(files), 200
+
+# ---------- DELETE: Remove File ----------
+@app.route("/api/files/<string:filename>", methods=["DELETE"])
+def delete_file(filename):
+    filename = secure_filename(filename)
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+
+    if not os.path.exists(file_path):
+        return jsonify({"error": "File not found"}), 404
+
+    os.remove(file_path)
+    return jsonify({"message": f"{filename} deleted successfully"}), 200
+
+# DOWLOAD FILE END POINT
+@app.route("/api/files/<string:filename>/download", methods=["GET"])
+def download_file(filename):
+    filename = secure_filename(filename)
+
+    if not allowed_file(filename):
+        return jsonify({"error": "Unsupported file type"}), 400
+
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+
+    if not os.path.exists(file_path):
+        return jsonify({"error": "File not found"}), 404
+
+    return send_from_directory(
+        directory=UPLOAD_FOLDER,
+        path=filename,
+        as_attachment=True
+    )
+
+# SQL DATA EXTRACTION AND INSERTION ENDPOINTS #####################
+# ---------- POST: Extract and Insert Data from Single File ----------
+@app.route("/api/sql/insert-file", methods=["POST"])
+def insert_file_data():
+    """Extract structured data from a file and insert into PostgreSQL database"""
+    try:
+        data = request.json or {}
+        file_path = data.get("file_path")
+        filename = data.get("filename")
+        
+        if not file_path:
+            return jsonify({"error": "file_path is required"}), 400
+        
+        # Check if file exists
+        if not os.path.exists(file_path):
+            return jsonify({"error": f"File not found: {file_path}"}), 404
+        
+        # Process file and insert data
+        result = process_file_and_insert(file_path, filename)
+        
+        if result["success"]:
+            return jsonify({
+                "success": True,
+                "message": "Data inserted successfully",
+                "file": result.get("file"),
+                "statements_count": result.get("statements_count", 0),
+                "parsed_queries": result.get("parsed_queries", []),
+                "execution_results": result.get("execution_results", []),
+                "text_length": result.get("text_length", 0)
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": result.get("error", "Failed to insert data"),
+                "file": result.get("file"),
+                "execution_results": result.get("execution_results", [])
+            }), 400
+    
+    except Exception as e:
+        error_str = str(e)
+        print(f"Error in insert_file_data: {error_str}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "error": error_str
+        }), 500
+
+# ---------- POST: Extract and Insert Data from Multiple Files ----------
+@app.route("/api/sql/insert-files", methods=["POST"])
+def insert_files_data():
+    """Extract structured data from multiple files and insert into PostgreSQL database"""
+    try:
+        data = request.json or {}
+        file_paths = data.get("file_paths", [])
+        
+        if not file_paths or not isinstance(file_paths, list):
+            return jsonify({"error": "file_paths must be a non-empty list"}), 400
+        
+        # Check if all files exist
+        missing_files = [fp for fp in file_paths if not os.path.exists(fp)]
+        if missing_files:
+            return jsonify({
+                "error": f"Files not found: {', '.join(missing_files)}"
+            }), 404
+        
+        # Process files and insert data
+        results = process_multiple_files(file_paths)
+        
+        # Count successes and failures
+        successful = [r for r in results if r.get("success")]
+        failed = [r for r in results if not r.get("success")]
+        
+        return jsonify({
+            "success": len(failed) == 0,
+            "message": f"Processed {len(results)} files: {len(successful)} successful, {len(failed)} failed",
+            "total_files": len(results),
+            "successful_count": len(successful),
+            "failed_count": len(failed),
+            "results": results
+        }), 200 if len(failed) == 0 else 207  # 207 Multi-Status
+    
+    except Exception as e:
+        error_str = str(e)
+        print(f"Error in insert_files_data: {error_str}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "error": error_str
+        }), 500
+
+# ---------- POST: Extract and Insert Data from Folder ----------
+@app.route("/api/sql/insert-folder", methods=["POST"])
+def insert_folder_data():
+    """Extract structured data from all files in a folder and insert into PostgreSQL database"""
+    try:
+        data = request.json or {}
+        folder_path = data.get("folder_path", UPLOAD_FOLDER)
+        file_extensions = data.get("file_extensions", None)
+        
+        if not os.path.exists(folder_path):
+            return jsonify({"error": f"Folder not found: {folder_path}"}), 404
+        
+        if not os.path.isdir(folder_path):
+            return jsonify({"error": f"Path is not a directory: {folder_path}"}), 400
+        
+        # Process folder and insert data
+        results = process_folder(folder_path, file_extensions)
+        
+        # Count successes and failures
+        successful = [r for r in results if r.get("success")]
+        failed = [r for r in results if not r.get("success")]
+        
+        return jsonify({
+            "success": len(failed) == 0,
+            "message": f"Processed {len(results)} files from folder: {len(successful)} successful, {len(failed)} failed",
+            "folder_path": folder_path,
+            "total_files": len(results),
+            "successful_count": len(successful),
+            "failed_count": len(failed),
+            "results": results
+        }), 200 if len(failed) == 0 else 207  # 207 Multi-Status
+    
+    except Exception as e:
+        error_str = str(e)
+        print(f"Error in insert_folder_data: {error_str}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "error": error_str
+        }), 500
+
+# ---------- POST: Extract and Insert Data from Uploaded Files ----------
+@app.route("/api/sql/insert-uploaded", methods=["POST"])
+def insert_uploaded_files():
+    """Extract structured data from uploaded files and insert into PostgreSQL database"""
+    try:
+        if "files" not in request.files:
+            return jsonify({"error": "No files provided"}), 400
+        
+        files = request.files.getlist("files")
+        if not files:
+            return jsonify({"error": "No files provided"}), 400
+        
+        file_paths = []
+        saved_files = []
+        
+        # Save uploaded files temporarily
+        for file in files:
+            filename = secure_filename(file.filename)
+            
+            if not allowed_file(filename):
+                continue
+            
+            file_path = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(file_path)
+            file_paths.append(file_path)
+            saved_files.append(filename)
+        
+        if not file_paths:
+            return jsonify({"error": "No valid files to process"}), 400
+        
+        # Process files and insert data
+        results = process_multiple_files(file_paths)
+        
+        # Count successes and failures
+        successful = [r for r in results if r.get("success")]
+        failed = [r for r in results if not r.get("success")]
+        
+        return jsonify({
+            "success": len(failed) == 0,
+            "message": f"Processed {len(results)} files: {len(successful)} successful, {len(failed)} failed",
+            "uploaded_files": saved_files,
+            "total_files": len(results),
+            "successful_count": len(successful),
+            "failed_count": len(failed),
+            "results": results
+        }), 200 if len(failed) == 0 else 207  # 207 Multi-Status
+    
+    except Exception as e:
+        error_str = str(e)
+        print(f"Error in insert_uploaded_files: {error_str}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "error": error_str
+        }), 500
+
+
+
+
+
+
 
 if __name__ == "__main__":
     # Configure to prevent constant restarts from venv file changes

@@ -296,6 +296,16 @@ with st.sidebar:
     
     if uploaded_files:
         st.info(f"📁 {len(uploaded_files)} fichier(s) sélectionné(s)")
+        # Choix: où insérer les documents
+        insert_target = st.radio(
+            "Si vous avez besoin : choisir où insérer",
+            options=("Vector DB (index seulement)", "Database (SQL)", "Both (Vector + Database)"),
+            index=0,
+            help="Choisissez d'insérer le(s) document(s) dans la base de vecteurs, la base de données relationnelle, ou les deux."
+        )
+
+        if insert_target == "Both (Vector + Database)":
+            st.warning("⚠️ Attention : sélectionner les deux peut prendre beaucoup de temps, surtout pour les gros fichiers.")
         
         if st.button("🚀 Construire l'Index", use_container_width=True, type="primary"):
             progress_bar = st.progress(0)
@@ -317,28 +327,57 @@ with st.sidebar:
                             f.write(uploaded_file.getbuffer())
                     
                     progress_bar.progress(0.6)
-                    status_text.text("🔨 Construction de l'index...")
-                    
-                    # Send to backend to build index
-                    response = requests.post(
-                        f"{BACKEND_URL}/api/build-index",
-                        json={"folder_path": temp_folder},
-                        timeout=60
-                    )
-                    
-                    progress_bar.progress(1.0)
-                    
-                    if response.status_code == 200:
-                        data = response.json()
-                        status_text.empty()
-                        st.success(f"✅ {data.get('message', 'Index créé avec succès!')}")
-                        st.balloons()
-                        st.info(f"📊 {data.get('chunks_created', 0)} segments créés")
-                        
-                        # Cleanup
-                        shutil.rmtree(temp_folder, ignore_errors=True)
-                    else:
-                        st.error(f"❌ Erreur: {response.text}")
+                    status_text.text("🔨 Préparation des opérations demandées...")
+
+                    # Determine actions based on user's choice
+                    build_index_needed = insert_target in ("Vector DB (index seulement)", "Both (Vector + Database)")
+                    insert_db_needed = insert_target in ("Database (SQL)", "Both (Vector + Database)")
+                    abort_after_index_failure = False
+
+                    # Build index if requested
+                    if build_index_needed:
+                        status_text.text("🔨 Construction de l'index...")
+                        response = requests.post(
+                            f"{BACKEND_URL}/api/build-index",
+                            json={"folder_path": temp_folder},
+                            timeout=120
+                        )
+
+                        progress_bar.progress(0.95)
+
+                        if response.status_code == 200:
+                            data = response.json()
+                            status_text.empty()
+                            st.success(f"✅ {data.get('message', 'Index créé avec succès!')}")
+                            st.balloons()
+                            st.info(f"📊 {data.get('chunks_created', 0)} segments créés")
+                        else:
+                            st.error(f"❌ Erreur lors de la construction de l'index: {response.text}")
+                            # If only vector was requested and index failed, abort further actions
+                            if not insert_db_needed:
+                                shutil.rmtree(temp_folder, ignore_errors=True)
+                                abort_after_index_failure = True
+
+                    # Insert into DB if requested
+                    if insert_db_needed and not abort_after_index_failure:
+                        status_text.text("💾 Insertion des données structurées en base de données...")
+                        try:
+                            insert_resp = requests.post(
+                                f"{BACKEND_URL}/api/sql/insert-folder",
+                                json={"folder_path": temp_folder},
+                                timeout=300
+                            )
+
+                            if insert_resp.status_code in (200, 207):
+                                insert_data = insert_resp.json()
+                                st.success(f"✅ Insertion en base terminée: {insert_data.get('successful_count', 0)} réussies, {insert_data.get('failed_count', 0)} échouées")
+                            else:
+                                st.error(f"❌ Échec de l'insertion en base: {insert_resp.status_code} {insert_resp.text}")
+                        except Exception as e:
+                            st.error(f"❌ Erreur lors de l'insertion en base: {e}")
+
+                    # Final cleanup
+                    shutil.rmtree(temp_folder, ignore_errors=True)
                 
                 except Exception as e:
                     st.error(f"❌ Échec du téléchargement: {str(e)}")

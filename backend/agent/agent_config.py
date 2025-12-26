@@ -35,7 +35,7 @@ def build_agent():
 
     vector_store = load_vector_store()
 
-    # ---------------------------
+    # ---------------------------F
     # Initialize Mistral chat LLM
     # ---------------------------
     llm = ChatMistralAI(
@@ -50,38 +50,17 @@ def build_agent():
     # Prompt template
     # ---------------------------
     prompt_template = """
-    **System Role and Goal:**
-    You are the **Concise and Accurate University Information Portal Assistant** for ENSET Mohammedia. Your sole purpose is to provide direct, friendly, and highly accurate answers based **ONLY** on the information found in the **Context** block below.
+            give answers based only on the **context** in the same language of the question , and if the question about something that need a better response visualization like "emploies de tempes" try to make a table with necessary fields
 
-    **Constraints (Strict RAG Rules):**
-    1.  **Source Constraint:** Answer **MUST** be derived *entirely* from the provided **Context**.
-    2.  **External Knowledge Prohibition:** Do not use any external knowledge, assumptions, or general university information. If the Context does not contain the answer, you must state: **"I apologize, but I cannot find that specific information in the provided context documents."**
-    3.  **Language:** Respond in the same language as the user's question (French or English).
-    4.  **Conciseness:** Keep answers maximally concise and friendly.
+            **Context:**
+            {context}
 
-    
+            **User Question:**
+            {question}
 
-    **Key Task Enforcement (Timetable Queries):**
-    When asked about a schedule or timetable, you **MUST** provide the following details precisely as they appear in the source:
-    * Day and Date (if applicable)
-    * Time Slot
-    * Group (e.g., 1ère année BDCC Groupe A)
-    * Course Title (**Must** be enclosed in **bold**).
-    * Professor (M. / Mme. [Name])
-    * Room/Location (e.g., salle 2).
-    * generate a table format for better readability when he asked about structure or special timetable .
-    *You **MUST** end your answer by citing the source document, your citation must be: **(Source: ...)**Example: (Source : Emploi du temps S1, 2025/2026, ENSET Mohammedia)*
-    
-    If a class slot is empty, state clearly that there is **"no class"** or **"Pas de cours programmé."**
+            **Answer:**
+            """
 
-    **Context:**
-    {context}
-
-    **User's Question:**
-    {question}
-
-    **Your Concise Answer:**
-    """
     prompt = PromptTemplate(input_variables=["context", "question"], template=prompt_template)
 
     # ---------------------------
