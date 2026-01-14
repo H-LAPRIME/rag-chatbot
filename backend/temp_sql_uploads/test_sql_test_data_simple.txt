@@ -1,0 +1,120 @@
+DEPARTMENT INFORMATION
+=======================
+
+Computer Science Department
+Location: Building A, Room 201
+Email: cs@university.edu
+Phone: +1-555-0101
+Description: Leading department in computer science and software engineering
+
+Mathematics Department  
+Location: Building B, Room 305
+Email: math@university.edu
+Phone: +1-555-0102
+Description: Offers programs in pure and applied mathematics
+
+ACADEMIC PROGRAMS
+=================
+
+Bachelor of Science in Computer Science
+Department: Computer Science
+Degree Type: Bachelor
+Duration: 4 years
+Description: Comprehensive program covering programming, algorithms, and software engineering
+Career Outcomes: Software developer, systems analyst, database administrator
+
+Master of Science in Mathematics
+Department: Mathematics  
+Degree Type: Master
+Duration: 2 years
+Description: Advanced program in mathematical modeling and computational methods
+Career Outcomes: Data scientist, quantitative analyst, research mathematician
+
+COURSES
+=======
+
+CS101 - Introduction to Programming
+Program: Computer Science
+Code: CS101
+Credits: 3
+Semester: Fall
+Description: Basic programming concepts and fundamentals
+
+CS201 - Data Structures
+Program: Computer Science
+Code: CS201
+Credits: 4
+Semester: Spring
+Description: Data structures and algorithm analysis
+
+EXAMS
+=====
+
+CS101 Midterm Exam
+Course: CS101
+Type: Midterm
+Date: 2024-10-15
+Time: 10:00 AM
+Duration: 90 minutes
+Total Marks: 100
+Location: Building A, Room 201
+Instructions: Bring calculator and student ID
+
+FACULTY
+=======
+
+Dr. John Smith
+Department: Computer Science
+Title: Professor
+Email: john.smith@university.edu
+Office: Building A, Room 210
+Office Hours: Monday and Wednesday 2:00 PM - 4:00 PM
+Bio: Expert in software engineering with 20 years of experience
+
+ADMISSIONS
+==========
+
+Computer Science Bachelor Program
+Program: Computer Science
+Requirements: High school mathematics and physics
+Deadline: 2024-03-15
+Tuition: $15,000 per year
+Scholarships: Merit-based scholarships available up to 50% tuition
+
+CALENDAR EVENTS
+===============
+
+Fall Semester 2024
+Event: Fall Semester Start
+Start Date: 2024-09-02
+End Date: 2024-12-20
+Description: Beginning of fall semester classes
+
+FAQs
+====
+
+Q: What are the office hours?
+A: Department offices are open Monday through Friday 9:00 AM to 5:00 PM
+
+Q: How do I register for courses?
+A: Registration is done online through the student portal one month before semester starts
+
+CAMPUS SERVICES
+==============
+
+University Library
+Name: Main Library
+Description: Study spaces and research resources
+Location: Building F
+Hours: Monday-Thursday 8:00 AM - 10:00 PM
+Contact: library@university.edu, +1-555-0201
+
+STUDENT CLUBS
+=============
+
+Computer Science Club
+Name: CS Club
+Category: Academic
+Description: Coding competitions and tech talks
+Contact: csclub@university.edu
+

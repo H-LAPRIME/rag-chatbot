@@ -141,7 +141,7 @@ def build_index(folder_path=None):
         all_chunks.extend(chunks)
 
     embeddings = init_embeddings()
-    vector_store = add_to_faiss_index(all_chunks, embeddings)
+    vector_store = create_and_populate_new_index(all_chunks, embeddings)
 
     os.makedirs(FAISS_INDEX_PATH, exist_ok=True)
     vector_store.save_local(FAISS_INDEX_PATH)

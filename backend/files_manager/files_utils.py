@@ -1,12 +1,10 @@
 import os
 import uuid
 from datetime import datetime
-from dotenv import load_dotenv
-load_dotenv()
 
 
 # Folder to store uploaded files
-UPLOAD_FOLDER = os.getenv("FEEDING_FILES_FOLDER_PATH")
+UPLOAD_FOLDER = './temp_uploads'  
 # Allowed extensions
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'md', 'docx', 'html'}
 

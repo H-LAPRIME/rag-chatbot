@@ -29,7 +29,7 @@ interface NavItem {
 
 const navItems_data: NavItem[] = [
   { icon: FolderOpen, label: "Knowledge Base", href: "/admin", active: true },
-  { icon: MessageSquare, label: "Chat", href: "/admin/logs" },
+  { icon: MessageSquare, label: "Chat", href: "/admin/chat" },
   { icon: History, label: "Data", href: "/admin/data" },
   { icon: Settings, label: "Settings", href: "/admin/settings" },
 ]

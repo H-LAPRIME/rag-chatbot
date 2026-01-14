@@ -1,5 +1,6 @@
 import { GraduationCap, Menu, MoreVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 export function ChatHeader() {
   return (
@@ -11,13 +12,17 @@ export function ChatHeader() {
           </Button>
 
           {/* Logo placeholder */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-card flex items-center justify-center shadow-md">
-              <GraduationCap className="h-6 w-6 md:h-7 md:w-7 text-primary" />
-            </div>
+          <div className="flex items-center gap-4">
+            <Image
+              src="/ENSET white.png"
+              alt="Logo"
+              width={40}
+              height={40}
+              className="w-32 h-auto object-contain"
+            />
             <div>
-              <h1 className="font-semibold text-base md:text-lg leading-tight">University Assistant</h1>
-              <p className="text-xs md:text-sm text-primary-foreground/80">Student Support Chat</p>
+              <h1 className="text-lg font-semibold">Chat with AI Tutor</h1>
+              <p className="text-sm text-primary-foreground/80">Your personal learning assistant</p>
             </div>
           </div>
         </div>

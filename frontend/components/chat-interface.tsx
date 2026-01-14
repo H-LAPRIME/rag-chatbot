@@ -5,6 +5,8 @@ import { ChatHeader } from "./chat-header"
 import { ChatMessages } from "./chat-messages"
 import { ChatInput } from "./chat-input"
 import { QuickActions } from "./quick-actions"
+import axios from "axios"
+import { API_URL } from "@/lib/utils"
 
 export interface Message {
   id: string
@@ -49,28 +51,17 @@ export function ChatInterface() {
     scrollToBottom()
   }, [messages])
 
-  const getBotResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase()
-    if (lowerMessage.includes("admission") || lowerMessage.includes("apply")) {
-      return botResponses.admission
+  const getBotResponse = async (userMessage: string): Promise<string> => {
+    try{
+         const response = await axios.post(`${API_URL}/api/chat`, { message: userMessage });
+         return response.data.reply || JSON.stringify({ intro_message : botResponses['default'] });
+    }catch(err){
+      console.error("Error in getBotResponse:", err);
     }
-    if (lowerMessage.includes("course") || lowerMessage.includes("program") || lowerMessage.includes("major")) {
-      return botResponses.courses
-    }
-    if (
-      lowerMessage.includes("financial") ||
-      lowerMessage.includes("scholarship") ||
-      lowerMessage.includes("tuition")
-    ) {
-      return botResponses.financial
-    }
-    if (lowerMessage.includes("housing") || lowerMessage.includes("dorm") || lowerMessage.includes("residence")) {
-      return botResponses.housing
-    }
-    return botResponses.default
+    return JSON.stringify({ intro_message : botResponses['default'] });
   }
 
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = async (content: string) => {
     const userMessage: Message = {
       id: Date.now().toString(),
       content,
@@ -81,16 +72,15 @@ export function ChatInterface() {
     setMessages((prev) => [...prev, userMessage])
     setIsTyping(true)
 
-    setTimeout(() => {
-      const botMessage: Message = {
+     const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: getBotResponse(content),
+        content: await getBotResponse(content),
         sender: "bot",
         timestamp: new Date(),
-      }
+    }
       setMessages((prev) => [...prev, botMessage])
       setIsTyping(false)
-    }, 1500)
+    
   }
 
   const handleQuickAction = (action: string) => {

@@ -1,6 +1,7 @@
 import { GraduationCap, Bell, Settings, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import Image from "next/image"
 
 export function AdminHeader() {
   return (
@@ -9,9 +10,13 @@ export function AdminHeader() {
         <div className="flex items-center gap-3">
           {/* Logo placeholder */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-card flex items-center justify-center shadow-md">
-              <GraduationCap className="h-6 w-6 md:h-7 md:w-7 text-primary" />
-            </div>
+               <Image
+                         src="/ENSET white.png"
+                         alt="Logo"
+                         width={40}
+                         height={40}
+                         className="w-32 h-auto object-contain"
+                       />
             <div>
               <h1 className="font-semibold text-base md:text-lg leading-tight">Admin Dashboard</h1>
               <p className="text-xs md:text-sm text-primary-foreground/80">Knowledge Base Manager</p>

@@ -122,7 +122,7 @@ export function FileManager() {
       setIndexingTitle("Feeding New Files")
       setIndexingMessage("Wait until the building process finish")
       setIndexingProg("Uploading / indexing files is in progress");
-      const res = await axios.post(`${API_URL}/api/files`, formData);
+      await axios.post(`${API_URL}/api/files`, formData);
       bringFiles()
     } catch (err) {
       console.log(err);  // ERROR HANDLING HERE
@@ -154,6 +154,12 @@ export function FileManager() {
         console.log(err)
       }
     }
+    try {
+        await axios.get(`${API_URL}/api/rebuild-index`);
+        toast.success("Selected files deleted and index rebuilt successfully")
+      } catch (err) {
+        console.log(err)
+      }
     bringFiles();
     setIsIndexing(false);
   }
@@ -186,7 +192,7 @@ export function FileManager() {
       setIndexingTitle("Feeding New Files")
       setIndexingMessage("Wait until the building process finish")
       setIndexingProg("Uploading / indexing files is in progress");
-      const res = await axios.post(`${API_URL}/api/files`, formData);
+      await axios.post(`${API_URL}/api/files`, formData);
       bringFiles()
     } catch (err) {
       console.log(err);  // ERROR HANDLING HERE

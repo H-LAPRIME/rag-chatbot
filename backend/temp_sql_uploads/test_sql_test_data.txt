@@ -1,0 +1,137 @@
+UNIVERSITY INFORMATION SYSTEM - TEST DATA
+==========================================
+
+DEPARTMENTS INFORMATION
+-------------------------
+
+The Computer Science Department is one of the leading departments at the university. It is located in Building A, Room 201. The department can be contacted via email at cs@university.edu or by phone at +1-555-0101. The department focuses on computer science, software engineering, and information technology programs.
+
+The Mathematics Department is located in Building B, Room 305. Contact email is math@university.edu and phone number is +1-555-0102. This department offers various mathematics programs including pure mathematics, applied mathematics, and statistics.
+
+The Physics Department is situated in Building C, Room 150. You can reach them at physics@university.edu or call +1-555-0103. The department specializes in theoretical physics, experimental physics, and astrophysics.
+
+The Engineering Department is located in Building D, Room 400. Contact information: engineering@university.edu, phone: +1-555-0104. This department offers civil engineering, mechanical engineering, and electrical engineering programs.
+
+ACADEMIC PROGRAMS
+-----------------
+
+The Computer Science Department offers a Bachelor of Science in Computer Science program. This is a 4-year degree program that covers programming, algorithms, data structures, software engineering, and computer systems. Graduates can pursue careers as software developers, systems analysts, database administrators, and IT consultants.
+
+The Mathematics Department offers a Master of Science in Applied Mathematics program. This is a 2-year degree program focusing on mathematical modeling, numerical analysis, and computational methods. Career outcomes include roles as data scientists, quantitative analysts, research mathematicians, and operations researchers.
+
+The Physics Department offers a Bachelor of Science in Physics program. This is a 4-year degree program covering classical mechanics, quantum mechanics, thermodynamics, and electromagnetism. Graduates can work as research scientists, physics teachers, laboratory technicians, or continue to graduate studies.
+
+The Engineering Department offers a Bachelor of Engineering in Civil Engineering program. This is a 4-year degree program that includes structural engineering, geotechnical engineering, transportation engineering, and environmental engineering. Career outcomes include civil engineer, structural engineer, project manager, and construction manager.
+
+COURSES INFORMATION
+-------------------
+
+In the Computer Science program, students must take CS101 - Introduction to Programming. This is a 3-credit course offered in Fall semester. The course covers basic programming concepts, data types, control structures, and functions. It is a foundational course for all computer science students.
+
+CS201 - Data Structures and Algorithms is a 4-credit course offered in Spring semester. This course covers arrays, linked lists, stacks, queues, trees, graphs, and various algorithms. Prerequisites include CS101.
+
+CS301 - Database Systems is a 3-credit course offered in Fall semester. Students learn about relational databases, SQL, database design, normalization, and transaction management. This course requires CS201 as a prerequisite.
+
+MATH201 - Linear Algebra is a 3-credit course offered in Fall and Spring semesters. This course covers vector spaces, matrices, eigenvalues, eigenvectors, and linear transformations. It is part of the Mathematics program.
+
+MATH301 - Differential Equations is a 3-credit course offered in Spring semester. Topics include first-order differential equations, second-order linear equations, systems of differential equations, and applications. Prerequisites: MATH201.
+
+PHYS101 - General Physics I is a 4-credit course offered in Fall semester. This course covers mechanics, kinematics, dynamics, work and energy, and rotational motion. It includes both lecture and laboratory components.
+
+PHYS201 - Electricity and Magnetism is a 4-credit course offered in Spring semester. Topics include electric fields, magnetic fields, electromagnetic induction, and Maxwell's equations. Prerequisites: PHYS101.
+
+ENG101 - Introduction to Engineering is a 2-credit course offered in Fall semester. This course introduces students to engineering principles, design process, and engineering ethics.
+
+EXAM SCHEDULE
+-------------
+
+The CS101 Midterm Exam is scheduled for October 15, 2024, starting at 10:00 AM. The exam duration is 90 minutes with a total of 100 marks. The exam will be held in Building A, Room 201. Instructions: Bring a calculator and student ID. No electronic devices allowed except calculators.
+
+The CS201 Final Exam is scheduled for December 20, 2024, starting at 2:00 PM. Duration is 180 minutes with 150 total marks. Location: Building A, Room 205. Instructions: This is a comprehensive exam covering all course material. Bring your student ID.
+
+The MATH201 Quiz is scheduled for November 5, 2024, starting at 9:00 AM. Duration is 45 minutes with 50 total marks. Location: Building B, Room 305. Instructions: Closed book exam. Only basic calculators allowed.
+
+The PHYS101 Final Exam is scheduled for December 18, 2024, starting at 9:00 AM. Duration is 120 minutes with 100 total marks. Location: Building C, Room 150. Instructions: Formula sheet will be provided. Bring calculator and student ID.
+
+FACULTY MEMBERS
+---------------
+
+Dr. John Smith is a Professor in the Computer Science Department. His email is john.smith@university.edu and his office is located in Building A, Room 210. Office hours are Monday and Wednesday from 2:00 PM to 4:00 PM. Dr. Smith has over 20 years of experience in software engineering and has published numerous papers on distributed systems.
+
+Dr. Sarah Johnson is an Associate Professor in the Mathematics Department. Contact: sarah.johnson@university.edu, office: Building B, Room 310. Office hours: Tuesday and Thursday from 10:00 AM to 12:00 PM. Dr. Johnson specializes in applied mathematics and mathematical modeling.
+
+Dr. Michael Brown is a Professor in the Physics Department. Email: michael.brown@university.edu, office: Building C, Room 155. Office hours: Monday, Wednesday, Friday from 1:00 PM to 3:00 PM. Dr. Brown is an expert in quantum mechanics and has received several research awards.
+
+Dr. Emily Davis is an Assistant Professor in the Engineering Department. Contact: emily.davis@university.edu, office: Building D, Room 405. Office hours: Tuesday from 2:00 PM to 5:00 PM. Dr. Davis focuses on structural engineering and sustainable design.
+
+ADMISSIONS INFORMATION
+-----------------------
+
+For the Computer Science Bachelor's program, applicants must have completed high school mathematics and physics courses. The application deadline is March 15, 2024. Tuition fee is $15,000 per year. Scholarships are available for students with outstanding academic records and financial need. Merit-based scholarships cover up to 50% of tuition.
+
+The Mathematics Master's program requires a Bachelor's degree in Mathematics or related field. Application deadline is February 1, 2024. Tuition fee is $12,000 per year. Graduate assistantships and research scholarships are available for qualified students.
+
+The Physics Bachelor's program requires high school physics and advanced mathematics. Application deadline is March 15, 2024. Tuition fee is $14,000 per year. The department offers several scholarships for physics students, including the Physics Excellence Scholarship.
+
+The Civil Engineering program requires high school mathematics, physics, and chemistry. Application deadline is March 15, 2024. Tuition fee is $16,000 per year. Engineering scholarships and co-op program opportunities are available.
+
+ACADEMIC CALENDAR
+-----------------
+
+Fall Semester 2024 begins on September 2, 2024 and ends on December 20, 2024. This includes orientation week, regular classes, midterm exams, and final exams.
+
+Spring Semester 2025 begins on January 15, 2025 and ends on May 10, 2025. The semester includes spring break from March 10 to March 17, 2025.
+
+Registration for Fall 2024 opens on August 1, 2024 and closes on August 30, 2024. Students must register during this period.
+
+Final Exam Week for Fall 2024 is from December 16, 2024 to December 20, 2024. All final exams are scheduled during this week.
+
+Graduation Ceremony for Class of 2024 is scheduled for May 25, 2024. The ceremony will be held in the main auditorium starting at 10:00 AM.
+
+FREQUENTLY ASKED QUESTIONS
+---------------------------
+
+Q: What are the office hours for the Computer Science department?
+A: The department office is open Monday through Friday from 9:00 AM to 5:00 PM. Individual faculty members have specific office hours posted on their office doors and course websites.
+
+Q: How do I register for courses?
+A: Course registration is done online through the student portal. Registration opens approximately one month before the start of each semester. You will receive an email notification when registration opens.
+
+Q: What is the deadline for dropping a course?
+A: You can drop a course without penalty within the first two weeks of the semester. After that, you may withdraw with a W grade until the midterm exam period.
+
+Q: Are there tutoring services available?
+A: Yes, the university offers free tutoring services for mathematics, physics, and computer science courses. Tutoring sessions are available in the Learning Center, Building E, Room 100, Monday through Friday from 10:00 AM to 6:00 PM.
+
+Q: How can I apply for scholarships?
+A: Scholarship applications are available through the financial aid office. Most scholarships require maintaining a minimum GPA and submitting an application form along with recommendation letters. Deadlines vary by scholarship type.
+
+CAMPUS SERVICES
+---------------
+
+The Library is located in Building F and is open Monday through Thursday from 8:00 AM to 10:00 PM, Friday from 8:00 AM to 6:00 PM, and Saturday from 10:00 AM to 4:00 PM. Contact: library@university.edu or call +1-555-0201. The library provides study spaces, computer access, research assistance, and access to online databases.
+
+The Health Center is located in Building G, Room 100. Operating hours are Monday through Friday from 9:00 AM to 5:00 PM. Contact: health@university.edu, phone: +1-555-0202. Services include general medical consultations, vaccinations, and mental health counseling.
+
+The Career Services Office is in Building H, Room 200. Open Monday through Friday from 10:00 AM to 4:00 PM. Contact: careers@university.edu, phone: +1-555-0203. They provide resume reviews, interview preparation, job search assistance, and career counseling.
+
+The IT Support Center is located in Building A, Room 50. Hours are Monday through Friday from 8:00 AM to 6:00 PM. Contact: itsupport@university.edu, phone: +1-555-0204. Services include computer repairs, software installation, network troubleshooting, and account assistance.
+
+STUDENT CLUBS
+-------------
+
+The Computer Science Club is a student organization for computer science enthusiasts. Category: Academic. The club organizes coding competitions, tech talks, and networking events. Contact: csclub@university.edu.
+
+The Mathematics Society is an academic club for mathematics students. Category: Academic. Activities include problem-solving sessions, guest lectures from mathematicians, and participation in math competitions. Contact: mathclub@university.edu.
+
+The Physics Student Association is for physics majors. Category: Academic. The association organizes lab tours, physics demonstrations, and research presentations. Contact: physicsclub@university.edu.
+
+The Engineering Student Council represents all engineering students. Category: Professional. Activities include industry visits, engineering projects, and professional development workshops. Contact: engclub@university.edu.
+
+The Photography Club is open to all students interested in photography. Category: Hobby. The club organizes photo walks, exhibitions, and photography workshops. Contact: photoclub@university.edu.
+
+The Debate Society is for students interested in public speaking and debate. Category: Academic. Activities include weekly debates, inter-university competitions, and public speaking workshops. Contact: debate@university.edu.
+
+END OF TEST DATA
+================
+

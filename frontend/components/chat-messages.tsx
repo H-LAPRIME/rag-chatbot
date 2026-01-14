@@ -2,7 +2,7 @@ import type React from "react"
 import { cn } from "@/lib/utils"
 import { Bot, User } from "lucide-react"
 import type { Message } from "./chat-interface"
-
+import Parent from "./chat-message/parent"
 interface ChatMessagesProps {
   messages: Message[]
   isTyping: boolean
@@ -49,7 +49,9 @@ export function ChatMessages({ messages, isTyping, messagesEndRef }: ChatMessage
                 : "bg-primary text-primary-foreground rounded-tr-sm",
             )}
           >
-            <p className="text-sm md:text-base leading-relaxed">{message.content}</p>
+            <div className="text-sm md:text-base leading-relaxed"> 
+              <Parent reply={message.content} />
+            </div>
             <p
               className={cn(
                 "text-[10px] md:text-xs mt-2",

@@ -2,16 +2,19 @@ from flask import Flask, request, jsonify ,send_from_directory
 from flask_cors import CORS
 from agent.agent_config import build_agent
 from embedding.build_index import build_index
+from embedding.rebuild_index import rebuild_index
 import os
 from werkzeug.utils import secure_filename
 from files_manager.files_utils import *
-from insert_db import process_file_and_insert, process_multiple_files, process_folder
-
+from database.insert_db import process_file_and_insert, process_multiple_files, process_folder
+from database.read_db import process_query_and_select
+import re
 app = Flask(__name__)
 CORS(app)
 
 # Configure upload settings
 UPLOAD_FOLDER = './temp_uploads'
+UPLOAD_SQL_FOLDER = './temp_sql_uploads'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'md', 'docx', 'html'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max file size
@@ -19,7 +22,11 @@ app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max file size
 # Ensure upload directory exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-agent = build_agent()  # initialize once
+try:
+ agent = build_agent()  # initialize once
+except Exception as e:
+    print(f"Error initializing agent: {e}")
+    agent = None
 
 def allowed_file(filename):
     """Check if file extension is allowed"""
@@ -31,32 +38,51 @@ def health():
     return jsonify({"status": "ok"}), 200
 
 
+
 @app.route("/api/chat", methods=["POST"])
 def chat():
     """Chat endpoint - process user messages"""
     data = request.json
     user_msg = data.get("message", "")
     user_id = data.get("user_id")  # for per-user memory if you want
+
+    def clean_json_response(raw_response: str) -> dict:
+        """
+        Cleans a string containing JSON wrapped in triple backticks and converts it to a Python dict.
+        """
+        # Remove ```json at the start and ``` at the end
+        cleaned = re.sub(r"^```json\s*|```$", "", raw_response.strip(), flags=re.MULTILINE).strip()
+        # Convert to Python dict
+        return cleaned
+            
     
     # ask the agent to handle the message and return answer
     response = agent.run(user_message=user_msg, user_id=user_id)
     return jsonify({
-        "reply": response.text, 
+        "reply": clean_json_response(response.text), 
         "thoughts": response.debug if hasattr(response, "debug") else None
     }), 200
+
+
+
+
 
 @app.route("/api/build-index", methods=["POST"])
 def build_index_endpoint():
     """Build FAISS index from uploaded documents"""
-    try:
-        data = request.json or {}
-        folder_path = data.get("folder_path", UPLOAD_FOLDER)
+    data = request.json or {}
+    folder_path = data.get("folder_path", UPLOAD_FOLDER)
         
-        print(f"Building index from: {folder_path}")
-        
+    print(f"Building index from: {folder_path}")
+   
+
+
+
+def rebuild_logic(folder_path):
+     try:
         # Call build_index function from build_index.py
         # This is a long-running operation, so we set a longer timeout
-        result = build_index(folder_path=folder_path)
+        result = rebuild_index(folder_path)
         
         if result["success"]:
             return jsonify({
@@ -72,9 +98,9 @@ def build_index_endpoint():
                 "error": error_msg
             }), status_code
     
-    except Exception as e:
+     except Exception as e:
         error_str = str(e)
-        print(f"Error in build_index_endpoint: {error_str}")
+        print(f"Error in Rebuild_index_endpoint: {error_str}")
         import traceback
         traceback.print_exc()
         
@@ -88,37 +114,36 @@ def build_index_endpoint():
                 "error": error_str
             }), 500
 
+@app.route("/api/rebuild-index", methods=["GET"])
+def rebuild_index_endpoint():
+    return rebuild_logic(UPLOAD_FOLDER)
 
 # FEEDING FILES MANAGEMENT END POINTS #####################
 # ---------- POST: Upload Files ----------
 @app.route("/api/files", methods=["POST"])
 def upload_files():
-    if "files" not in request.files:
-        return jsonify({"error": "No files provided"}), 400
+        if "files" not in request.files:
+            return jsonify({"error": "No files provided"}), 400
 
-    files = request.files.getlist("files")
-    response = []
+        files = request.files.getlist("files")
+        response = []
 
-    for file in files:
-        filename = secure_filename(file.filename)
+        for file in files:
+            filename = secure_filename(file.filename)
 
-        if not allowed_file(filename):
-            response.append({
-                "name": filename,
-                "status": "rejected",
-                "reason": "unsupported file type"
-            })
-            continue
+            if not allowed_file(filename):
+                response.append({
+                    "name": filename,
+                    "status": "rejected",
+                    "reason": "unsupported file type"
+                })
+                continue
 
-        file_path = os.path.join(UPLOAD_FOLDER, filename)
-        file.save(file_path)
+            file_path = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(file_path)
 
-        response.append({
-            "name": filename,
-            "status": "uploaded"
-        })
-
-    return jsonify(response), 201
+            return rebuild_logic(UPLOAD_FOLDER)
+        
 
 # ---------- GET: List Files ----------
 @app.route("/api/files", methods=["GET"])
@@ -162,6 +187,7 @@ def download_file(filename):
         path=filename,
         as_attachment=True
     )
+
 
 # SQL DATA EXTRACTION AND INSERTION ENDPOINTS #####################
 # ---------- POST: Extract and Insert Data from Single File ----------
@@ -261,7 +287,7 @@ def insert_folder_data():
     """Extract structured data from all files in a folder and insert into PostgreSQL database"""
     try:
         data = request.json or {}
-        folder_path = data.get("folder_path", UPLOAD_FOLDER)
+        folder_path = data.get("folder_path", UPLOAD_SQL_FOLDER)
         file_extensions = data.get("file_extensions", None)
         
         if not os.path.exists(folder_path):
@@ -319,7 +345,8 @@ def insert_uploaded_files():
             if not allowed_file(filename):
                 continue
             
-            file_path = os.path.join(UPLOAD_FOLDER, filename)
+            os.makedirs(UPLOAD_SQL_FOLDER, exist_ok=True)
+            file_path = os.path.join(UPLOAD_SQL_FOLDER, filename)
             file.save(file_path)
             file_paths.append(file_path)
             saved_files.append(filename)
@@ -354,9 +381,14 @@ def insert_uploaded_files():
             "error": error_str
         }), 500
 
-
-
-
+@app.route("/api/sql/test-select", methods=["POST"])
+def test_select():
+    data = request.json
+    user_msg = data.get("message", "")
+    
+    # ask the agent to handle the message and return answer
+    response = process_query_and_select(question=user_msg)
+    return jsonify(response), 200
 
 
 
