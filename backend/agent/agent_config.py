@@ -11,9 +11,9 @@ from database.read_db import process_query_and_select
 load_dotenv()
 
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
-MISTRAL_MODEL = os.getenv("MISTRAL_MODEL", "mistral-small-latest ")
+MISTRAL_MODEL = os.getenv("MISTRAL_MODEL", "mistral-small-latest").strip()
 FAISS_INDEX_PATH = os.getenv("FAISS_INDEX_PATH", "./faiss_index")
-TOP_K = int(os.getenv("TOP_K", 4))
+TOP_K = int(os.getenv("TOP_K", 8))
 
 if not MISTRAL_API_KEY:
     raise ValueError("MISTRAL_API_KEY is required")
@@ -43,7 +43,10 @@ def build_agent():
         if not result.get('success'):
              return ''
         data = result.get('results', [])
-        return json.dumps(data)
+        # Only return data if at least one result has rows
+        if any(r.get('rowcount', 0) > 0 for r in data):
+            return json.dumps(data)
+        return ''
        except Exception as e:
         print(f"Error loading structured data: {str(e)}")
         return ''
@@ -56,7 +59,7 @@ def build_agent():
     llm = ChatMistralAI(
     mistral_api_key=MISTRAL_API_KEY,
     model=MISTRAL_MODEL,
-    temperature=0.2,
+    temperature=0.1,  # Lower temperature for stricter factual adherence
     timeout=20
     )
 
@@ -71,6 +74,16 @@ Your role is to answer student and staff questions accurately and professionally
 using ONLY the information provided in:
 - the CONTEXT section (unstructured text)
 - the STRUCTURED_DATA section (JSON data extracted from the database)
+
+SPECIAL INSTRUCTION FOR TIMETABLES (EMPLOI DU TEMPS):
+- If the user asks for a timetable ("emploi du temps"), look for this information in BOTH the CONTEXT and STRUCTURED_DATA.
+- You MUST format "emploi du temps" as a "table" in the "structured" section (this applies to ~80% of schedule-related requests).
+- **CRITICAL ANTI-HALLUCINATION RULE**: Use ONLY information explicitly stated in the provided documents. If a subject (e.g., "Physique", "Maths") or a time slot is not clearly present in the CONTEXT or STRUCTURED_DATA for the specific class requested, DO NOT invent it.
+- **CRITICAL**: If the STRUCTURED_DATA section is empty or contains no relevant rows, you MUST use the information from the CONTEXT section. Do NOT state that information is unavailable if it exists in the CONTEXT, even if the information is unstructured text or partial.
+- **REASONING TIP**: If you see a text block that looks like a schedule (listing days, times, and subjects), extract that data and put it in a table, even if it's not labeled "Timetable".
+- If you are unsure about a piece of information (e.g., you see a subject name but are not sure if it belongs to Lundi or Mardi), it is better to omit it than to provide a wrong answer.
+- Ensure you extract data for ALL requested days or time slots mentioned in the message (e.g., "from Monday to Tuesday" should include both days). If the context has info for both days, include them both in your table.
+- If the data is in the CONTEXT as unstructured text, manually format it into a valid JSON table structure.
 
 
 The user question will appear after the ***MESSAGE*** marker at the end of this prompt.
@@ -196,7 +209,7 @@ FIELD DEFINITIONS
 - A short, friendly introductory sentence to prepare the user for the response
 
 2. content.structured
-- Used ONLY when structured data is available and relevant
+- Used when structured data is available or when information in the CONTEXT clearly fits a tabular or list structure (especially for timetables/schedules).
 
 3. structured.message
 - Short explanation of what the structured data represents
@@ -223,11 +236,11 @@ Rules:
 DATA USAGE RULES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-- Never hallucinate
-- If data is missing, say so clearly
+- Never hallucinate subjects, names, or dates.
+- If data is missing or incomplete, say so clearly for those specific parts.
 - Do not repeat structured data in rawtext
 - No HTML, no Markdown
-- If you cannot answer, return an empty structured array
+- If you cannot answer based on the provided information, return an empty structured array.
 
 CRITICAL RESPONSE RULE:
 

@@ -18,8 +18,13 @@ export interface Message {
 const initialMessages: Message[] = [
   {
     id: "1",
-    content:
-      "Hello! 👋 Welcome to the University Assistant. I'm here to help you with admissions, course information, campus services, and more. How can I assist you today?",
+    content: JSON.stringify({
+      intro_message: "Hello! 👋 Welcome to the University Assistant. I'm here to help you with admissions, course information, campus services, and more. How can I assist you today?",
+      content: {
+        structured: [],
+        rawtext: ""
+      }
+    }),
     sender: "bot",
     timestamp: new Date(),
   },
@@ -39,9 +44,13 @@ const botResponses: Record<string, string> = {
 }
 
 export function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>(initialMessages)
+  const [messages, setMessages] = useState<Message[]>([])
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setMessages(initialMessages)
+  }, [])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -52,13 +61,13 @@ export function ChatInterface() {
   }, [messages])
 
   const getBotResponse = async (userMessage: string): Promise<string> => {
-    try{
-         const response = await axios.post(`${API_URL}/api/chat`, { message: userMessage });
-         return response.data.reply || JSON.stringify({ intro_message : botResponses['default'] });
-    }catch(err){
+    try {
+      const response = await axios.post(`${API_URL}/api/chat`, { message: userMessage });
+      return response.data.reply || JSON.stringify({ intro_message: botResponses['default'] });
+    } catch (err) {
       console.error("Error in getBotResponse:", err);
     }
-    return JSON.stringify({ intro_message : botResponses['default'] });
+    return JSON.stringify({ intro_message: botResponses['default'] });
   }
 
   const handleSendMessage = async (content: string) => {
@@ -72,15 +81,15 @@ export function ChatInterface() {
     setMessages((prev) => [...prev, userMessage])
     setIsTyping(true)
 
-     const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: await getBotResponse(content),
-        sender: "bot",
-        timestamp: new Date(),
+    const botMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      content: await getBotResponse(content),
+      sender: "bot",
+      timestamp: new Date(),
     }
-      setMessages((prev) => [...prev, botMessage])
-      setIsTyping(false)
-    
+    setMessages((prev) => [...prev, botMessage])
+    setIsTyping(false)
+
   }
 
   const handleQuickAction = (action: string) => {

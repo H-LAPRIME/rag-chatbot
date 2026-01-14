@@ -38,3 +38,4 @@ markitdown>=0.1.0
 sqlalchemy>=2.0.0
 psycopg2-binary>=2.9.0
 langchain-experimental>=0.0.20
+markitdown[pdf]

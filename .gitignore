@@ -83,3 +83,9 @@ temp/
 *.egg-info/
 
 frontend/node_modules/
+
+# Backend Local Data
+backend/faiss_index/
+backend/temp_uploads/
+backend/temp_sql_uploads/
+backend/data.db

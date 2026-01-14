@@ -11,11 +11,15 @@ export default function Parent({ reply }: { reply: string }) {
   const [response, setResponse] = useState<ResponseType | null>(null);
 
   useEffect(() => {
-    try {
-      const parsedResponse: ResponseType = JSON.parse(reply);
-      setResponse(parsedResponse);
-    } catch (error) {
-      console.error("Failed to parse response:", error);
+    if (reply.trim().startsWith("{") || reply.trim().startsWith("[")) {
+      try {
+        const parsedResponse: ResponseType = JSON.parse(reply);
+        setResponse(parsedResponse);
+      } catch (error) {
+        console.error("Failed to parse response:", error);
+      }
+    } else {
+      setResponse(null);
     }
   }, [reply]);
 

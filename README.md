@@ -1,158 +1,94 @@
-# rag-chatbot
+# 🤖 ENSET Mohammedia RAG & SQL Chatbot
 
-Minimal instructions to set up and run this project on Windows after pulling the repository.
-
-## Prerequisites
-- Python 3.9+ installed and on PATH
-- git (optional, if you clone the repo)
-- Internet access to install pip packages
-
-Project layout (important files)
-- backend/app.py — backend service
-- backend/streamlit_app.py — Streamlit UI
-- backend/Requirements.txt — Python dependencies
-- backend/.env — environment variables (create/edit as needed)
+A powerful, hybrid intelligent assistant for **ENSET Mohammedia**. This chatbot combines **RAG (Retrieval-Augmented Generation)** for unstructured document search (PDFs, TXT, MD) with **SQL-based structured data retrieval** for database queries.
 
 ---
 
-## 1) Open a terminal in project root (Terminal A)
-Open PowerShell or Command Prompt at:
-```
-C:\Users\pc\Desktop\rag-chatbot
-```
+## 🌟 Features
+
+- **Hybrid Intelligence**: Automatically switches between searching documents (RAG) and querying the database (SQL).
+- **Pro Timetables**: Specifically optimized to extract and format class schedules into clean, readable tables.
+- **Deep Extraction**: Uses `MarkItDown` with PDF support to index complex documents.
+- **Smart Formatting**: Returns responses in structured JSON for a modern, component-based UI.
+- **Mistral AI Powered**: Utilizes state-of-the-art Mistral models for both embeddings and reasoning.
 
 ---
 
-## 2) Create and activate a virtual environment in Backend (Terminal A)
+## 🏗️ Project Structure
 
-Command Prompt (cmd.exe):
-```
-cd .\backend\
-
-```
-
-
-PowerShell:
-```
-python -m venv .venv
-# if execution policy blocks activation, run:
-# Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.venv\Scripts\Activate.ps1
-```
-
-
-Confirm venv active: prompt starts with `(.venv)` and run:
-```
-python --version
-pip --version
-```
+- `backend/`: Flask API, Agent logic, Vector Store (FAISS), and Database handlers.
+- `frontend/`: Modern Next.js Chat Interface.
+- `docs/`: (Temporary) Folder for user-uploaded documents.
 
 ---
 
-## 3) Upgrade pip (recommended) (Terminal A)
-```
-python -m pip install --upgrade pip
-```
+## 🚀 Getting Started
+
+### 1️⃣ Backend Setup
+1. **Navigate to the backend folder**:
+   ```bash
+   cd backend
+   ```
+2. **Create a virtual environment**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Windows: venv\Scripts\activate
+   ```
+3. **Install dependencies**:
+   ```bash
+   pip install -r Requirements.txt
+   pip install markitdown[pdf]  # Ensure PDF support
+   ```
+4. **Configure `.env`**:
+   Create a `.env` file in the `backend/` directory:
+   ```env
+   MISTRAL_API_KEY=your_key_here
+   MISTRAL_MODEL=mistral-small-latest
+   TOP_K=8
+   USE_RELOADER=False
+   ```
+5. **Run the server**:
+   ```bash
+   python app.py
+   ```
+
+### 2️⃣ Frontend Setup
+1. **Navigate to the frontend folder**:
+   ```bash
+   cd frontend
+   ```
+2. **Install dependencies**:
+   ```bash
+   npm install  # or pnpm install
+   ```
+3. **Run the development server**:
+   ```bash
+   npm run dev
+   ```
+4. **Access the App**: Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 4) Install requirements (Terminal A)
-```
-pip install -r backend\Requirements.txt
-```
+## 🛠️ Key Components
 
-If you see missing packages later, re-run the command.
+### RAG System
+Located in `backend/embedding/`, the system converts PDFs and text files into a FAISS vector index. The `agent_config.py` handles semantic search.
 
----
+### SQL Integration
+Located in `backend/database/`, it handles natural language to SQL translation, allowing the agent to query structured data about courses, departments, and faculty.
 
-## 5) Configure environment variables (Terminal A)
-If `backend/.env` is required, create or edit it. Example:
-```
-# backend\.env
-FLASK_ENV=development
-OPENAI_API_KEY=your_api_key_here
-OTHER_VAR=value
-```
-Open with Notepad:
-```
-notepad backend\.env
-```
+### The Agent
+The core logic resides in `backend/agent/agent_config.py`. It uses specialized prompt engineering to prioritize context and prevent hallucinations.
 
 ---
 
-## 6) Run the backend (Terminal A)
-Open Terminal A, activate the venv, then:
+## 📋 Best Practices for Usage
 
-Option 1 — direct run (if app.py is executable):
-```
-python backend\app.py
-```
-
-# PowerShell / CMD (Terminal A):
-
-```
-
-Confirm backend is running:
-- Visit: http://localhost:5000/health
-- Or PowerShell:
-```
-Invoke-WebRequest http://localhost:5000/health -UseBasicParsing
-
-## 7) Run Streamlit UI (Terminal B)
-
-Open a second terminal ,then:
-
-Command Prompt (cmd.exe):
-```
-cd .\backend\
-
-```
-
-## 7) Run Streamlit UI (Terminal B)
-Open a second terminal, then:
-```
-streamlit run streamlit_app.py
-```
-Streamlit will open at http://localhost:8501 by default.
+- **Timetables**: Upload PDF schedules and rebuild the index via the UI for the best results.
+- **Questions**: Ask about specific departments, teachers, or schedules.
+- **Cleanup**: The `faiss_index` and `temp_uploads` are ignored by git to keep your repository clean.
 
 ---
 
-## 8) Using the app
-- Use the Streamlit UI to upload documents and build the index (if provided).
-- Ask questions in the chat; Streamlit will call the backend endpoints (default: port 5000).
-
-Optional: run index builder script (if present)
-```
-python backend\embedding\build_index.py
-```
-
----
-
-## Common commands
-Deactivate venv:
-```
-deactivate
-```
-
-Reinstall dependencies:
-```
-pip install -r backend\Requirements.txt
-```
-
-Check open ports (if conflict):
-```
-netstat -ano | findstr :5000
-```
-
----
-
-## Troubleshooting
-- "ModuleNotFoundError": ensure venv activated and packages installed in that venv.
-- Streamlit doesn't open: ensure `streamlit` is installed in the activated venv.
-- Backend connection errors in UI: confirm backend running at http://localhost:5000 and health endpoint returns OK.
-- PowerShell activation blocked: run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` in that session.
-- If you get errors during index build/upload, check `backend/temp_uploads` for saved files and backend logs for stack traces.
-
----
-
-If anything fails, copy the terminal error text and share it for help.
+## 🤝 Contributing
+Feel free to fork this project and submit pull requests. For major changes, please open an issue first to discuss what you would like to change.

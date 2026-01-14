@@ -56,7 +56,15 @@ def chat():
         return cleaned
             
     
-    # ask the agent to handle the message and return answer
+# ask the agent to handle the message and return answer
+    global agent
+    if agent is None:
+        try:
+            print("Trying to re-initialize agent...")
+            agent = build_agent()
+        except Exception as e:
+            return jsonify({"error": f"Agent could not be initialized: {str(e)}"}), 500
+
     response = agent.run(user_message=user_msg, user_id=user_id)
     return jsonify({
         "reply": clean_json_response(response.text), 

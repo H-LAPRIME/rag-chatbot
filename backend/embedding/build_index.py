@@ -53,19 +53,19 @@ def split_text_into_chunks(text, source):
 
 def init_embeddings():
     try:
-        print(f"🔤 Initializing Mistral embeddings: {MISTRAL_EMBED_MODEL}")
+        print(f"Initializing Mistral embeddings: {MISTRAL_EMBED_MODEL}")
         embeddings = MistralAIEmbeddings(api_key=MISTRAL_API_KEY, model=MISTRAL_EMBED_MODEL)
         test_vec = embeddings.embed_query("test")
-        print(f"✓ Mistral embedding dimension: {len(test_vec)}")
+        print(f"Mistral embedding dimension: {len(test_vec)}")
         return embeddings
     except Exception as e:
-        print(f"✗ Error initializing embeddings: {e}")
+        print(f"Error initializing embeddings: {e}")
         traceback.print_exc()
         raise
 
 
 def create_new_faiss_index(embeddings):
-    print("🏗️ Creating new FAISS index...")
+    print("Creating new FAISS index...")
     dim = len(embeddings.embed_query("test"))
     index = faiss.IndexFlatL2(dim)
     return FAISS(
